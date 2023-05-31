@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Travel Planner</title>
+    <style>
+        #timerContainer {
+            display: none;
+            font-weight: bold;
+        }
+
+        .buffering {
+            display: none;
+        }
+
+        .buffering::after {
+            content: "Buffering...";
+            display: inline-block;
+            animation: bufferingAnimation 1s infinite;
+        }
+        @keyframes bufferingAnimation {
+            0% { content: "답변을 기다리고 있습니다."; }
+            10% { content: "답변을 기다리고 있습니다.."; }
+            20% { content: "답변을 기다리고 있습니다..."; }
+            30% { content: "답변을 기다리고 있습니다...."; }
+            40% { content: "답변을 기다리고 있습니다....."; }
+            50% { content: "답변을 기다리고 있습니다......"; }
+            60% { content: "답변을 기다리고 있습니다......."; }
+            70% { content: "답변을 기다리고 있습니다........"; }
+            80% { content: "답변을 기다리고 있습니다........."; }
+            90% { content: "답변을 기다리고 있습니다.........."; }
+        }
+        .card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Travel Planner</h1>
+    <form id="postForm">
+        <label for="user_content"></label>
+        <textarea id="user_content" name="user_content" rows="4" cols="50"></textarea>
+        <div id="places_list"></div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="bufferingIndicator" class="buffering"></div>
+    <div id="timerContainer">
+        Response Time: <span id="responseTime"></span> seconds
+    </div>
+    <div id="responseContent"></div>
+    <div id="cardsContainer"></div>
+
+    <script>
+        const form = document.getElementById('postForm');
+        const url = 'https://estsoft-openai-api.jejucodingcamp.workers.dev/';
+        const responseContent = document.getElementById('responseContent');
+        const bufferingIndicator = document.getElementById('bufferingIndicator');
+        const timerContainer = document.getElementById('timerContainer');
+        const responseTimeElement = document.getElementById('responseTime');
+
+        /********* Data **********/
+        let data = [
+            {
+                role: "system",
+                content: "여행자가 여행하고 싶은 장소들을 연결하는 최적의 경로와 비용을 알려주는 챗봇. DAY 1, DAY 2 이런식으로 알려줘."
+            },
+        ];
+
+        /********* Event Handling  **********/
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const userContent = document.getElementById('user_content').value;
+            data.push({
+                role: 'user',
+                content: userContent
+            });
+
+            chatbotAPI();
+
+        });
+
+        /********* API **********/
+
+        function chatbotAPI() {
+            bufferingIndicator.style.display = 'inline-block';
+            const startTime = Date.now();
+
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                bufferingIndicator.style.display = 'none';
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Error: ' + response.status);
+                }
+            })
+            .then(responseData => {
+                let assistantMessage = responseData.choices[0].message.content;
+                assistantMessage = assistantMessage.replace(/DAY/g, "<br>DAY");
+                responseContent.innerHTML = assistantMessage;
+                data.push({
+                    role: 'assistant',
+                    content: assistantMessage
+                });
+                let responseTime = ((Date.now() - startTime) / 1000).toFixed(2);
+                responseTimeElement.textContent = responseTime;
+
+                timerContainer.style.display = 'block';
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        }
+
+        /********* Fucntions list **********/
+    </script>
+</body>
+</html>
