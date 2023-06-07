@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Travel Planner</title>
+    <title>작가 어시스턴트</title>
     <style>
         #timerContainer {
             display: none;
@@ -37,11 +37,20 @@
     </style>
 </head>
 <body>
-    <h1>Travel Planner</h1>
+    <h1>작가 어시스턴트</h1>
     <form id="postForm">
-        <label for="user_content"></label>
-        <textarea id="user_content" name="user_content" rows="4" cols="50"></textarea>
-        <div id="places_list"></div>
+        <p>장르</p>
+        <label for="genre"></label>
+        <input id="genre" name="genre" rows="4" cols="50"></input>
+
+        <p>캐릭터</p>
+        <label for="characters"></label>
+        <input id="characters" name="characters" rows="4" cols="50"></input>
+
+        <p>스토리</p>
+        <label for="story"></label>
+        <textarea id="story" name="story" rows="4" cols="50"></textarea>
+        
         <button type="submit">Submit</button>
     </form>
 
@@ -64,7 +73,7 @@
         let data = [
             {
                 role: "system",
-                content: "여행자가 여행하고 싶은 장소들을 연결하는 최적의 경로와 비용을 알려주는 챗봇. DAY 1, DAY 2 이런식으로 알려줘."
+                content: "역할은 책을 쓰는 작가야"
             },
         ];
 
@@ -72,7 +81,10 @@
         form.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const userContent = document.getElementById('user_content').value;
+            const genre = document.getElementById('genre').value;
+            const characters = document.getElementById('characters').value;
+            const story = document.getElementById('story').value;
+            userContent = `장르는 ${genre}, 메인 캐릭터는 ${characters}이며 스토리는 ${story}인 내용의 책을 만들어줘.`
             data.push({
                 role: 'user',
                 content: userContent
