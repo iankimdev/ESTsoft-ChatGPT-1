@@ -2,8 +2,7 @@
 <html>
 <head>
     <title>작가 어시스턴트</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         #timerContainer {
             display: none;
@@ -28,7 +27,7 @@
             50% { content: "답변을 기다리고 있습니다......"; }
             60% { content: "답변을 기다리고 있습니다......."; }
             70% { content: "답변을 기다리고 있습니다........"; }
-            80% { content: "답변을 기다리고 있습니다........."; }
+             80% { content: "답변을 기다리고 있습니다........."; }
             90% { content: "답변을 기다리고 있습니다.........."; }
         }
         .card {
@@ -39,36 +38,57 @@
     </style>
 </head>
 <body>
-    <h1 class="text-center mt-5">작가 어시스턴트</h1>
-    <div class="container mx-auto mt-5 px-4">
-        <form id="postForm">
-            <div class="mb-3">
-                <label for="genre" class="form-label">장르</label>
-                <input type="text" class="form-control" id="genre" name="genre" aria-describedby="genreHelp">
-                <div id="genreHelp" class="form-text">작성하고자 하는 책의 장르를 입력하세요.</div>
-            </div>
-            <div class="mb-3">
-                <label for="characters" class="form-label">캐릭터</label>
-                <input type="text" class="form-control" id="characters" name="characters" aria-describedby="charactersHelp">
-                <div id="charactersHelp" class="form-text">작성하고자 하는 책의 주요 캐릭터를 입력하세요.</div>
-            </div>
-            <div class="mb-3">
-                <label for="story" class="form-label">스토리</label>
-                <textarea class="form-control" id="story" name="story" rows="4" cols="50" aria-describedby="storyHelp"></textarea>
-                <div id="storyHelp" class="form-text">작성하고자 하는 책의 스토리 개요를 입력하세요.</div>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+    <div class="container">
+        <h1>작가 어시스턴트</h1>
+        <div id="contentContainer">
+            <form id="postForm">
+                <div class="mb-3">
+                    <label for="genre" class="form-label">장르</label>
+                    <input type="text" class="form-control" id="genre" name="genre">
+                </div>
+
+                <div class="mb-3">
+                    <label for="characters" class="form-label">캐릭터</label>
+                    <input type="text" class="form-control" id="characters" name="characters">
+                </div>
+
+                <div class="mb-3">
+                    <label for="story" class="form-label">스토리</label>
+                    <textarea class="form-control" id="story" name="story" rows="4" cols="50" aria-describedby="storyHelp"></textarea>
+                    <div id="storyHelp" class="form-text">작성하고자 하는 책의 스토리 개요를 입력하세요.</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
 
         <div id="bufferingIndicator" class="buffering"></div>
-        <div id="timerContainer" class="mt-3">
+        <div id="timerContainer">
             Response Time: <span id="responseTime"></span> seconds
         </div>
-        <div id="responseContent" class="mt-3"></div>
-        <div id="cardsContainer" class="mt-3"></div>
+        <div id="responseContent"></div>
+        <div id="cardsContainer"></div>
     </div>
 
+    <!-- 모달 -->
+    <div id="modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">알림</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>스토리를 확장해 나가세요!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const form = document.getElementById('postForm');
         const url = 'https://estsoft-openai-api.jejucodingcamp.workers.dev/';
@@ -76,6 +96,8 @@
         const bufferingIndicator = document.getElementById('bufferingIndicator');
         const timerContainer = document.getElementById('timerContainer');
         const responseTimeElement = document.getElementById('responseTime');
+        const contentContainer = document.getElementById('contentContainer');
+        const modal = new bootstrap.Modal(document.getElementById('modal'));
 
         /********* Data **********/
         let data = [
@@ -99,7 +121,7 @@
             });
 
             chatbotAPI();
-
+            form.reset();
         });
 
         /********* API **********/
@@ -135,13 +157,21 @@
                 responseTimeElement.textContent = responseTime;
 
                 timerContainer.style.display = 'block';
+                clearInputFields();
+                
+                // Show modal
+                modal.show();
             })
             .catch(error => {
                 console.error(error);
             });
         }
 
-        /********* Fucntions list **********/
+        function clearInputFields() {
+            document.getElementById('genre').value = '';
+            document.getElementById('characters').value = '';
+            document.getElementById('story').value = '';
+        }
     </script>
 </body>
 </html>
